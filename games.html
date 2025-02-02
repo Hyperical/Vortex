@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://fonts.googleapis.com/css2?family=Exo+2:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+  <title>Game Cards</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap');
+    @import url('https://fonts.googleapis.com/icon?family=Material+Icons');
+
+    body {
+      font-family: 'Exo 2', sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: transparent;
+      overflow: auto;
+    }
+    .author-tag {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      background-color: rgba(0, 0, 0, 0.7);
+      color: white;
+      font-size: 12px;
+      padding: 4px 8px;
+      border-radius: 10px;
+      font-weight: bold;
+    }
+
+    @keyframes slideDown {
+      from {
+        transform: translateY(-100%);
+      }
+      to {
+        transform: translateY(0);
+      }
+    }
+
+    .search-bar {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      width: 100%;
+      font-family: 'Exo 2';
+      padding: 0 16px;
+      position: fixed;
+      top: 20px;
+      z-index: 10;
+      font-size: 16px;
+      height: 47px;
+      transition: transform 0.5s ease-out;
+      justify-content: center;
+    }
+
+    .search-bar input {
+      background-color: #0e2545;
+      color: white;
+      font-family: 'Exo 2';
+      width: 50%;
+      height:50%;
+      text-align: center;
+      max-width: 800px;
+      padding: 8px;
+      font-size: 16px;
+      border: 2px solid #1b4d96; /* Blue-ish border */
+      border-radius: 20px;
+      transition: all 0.3s ease;
+      font-size: 1em;
+    }
+
+    .search-bar input:focus {
+      outline: none;
+      border-color: #145ec9;
+      box-shadow: 0 0 8px rgba(27, 77, 150, 0.5);
+    }
+
+    .search-bar input::placeholder {
+      color: ;
+    }
+
+    .game-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 30px;
+      justify-content: center;
+      padding-top: 60px;
+      margin-top: 70px; /* Adjusted for search bar */
+      margin-bottom: 60px;
+    }
+
+    .game-card {
+      position: relative;
+      width: 300px;
+      height: 150px;
+      overflow: hidden;
+      border-radius: 15px;
+      box-shadow: 0 6px 10px rgba(0, 0, 0, 0.1);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      cursor: pointer;
+      background-color: #fff;
+      margin: 0 auto;
+      border: 2px solid #4dabf7; /* Blue-ish border for cards */
+    }
+
+    .game-card:hover {
+      transform: translateY(-10px);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+    }
+
+    .game-card img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      background-color: #ccc;
+    }
+
+    .game-card .overlay {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      background: linear-gradient(to top, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0));
+      color: #fff;
+      padding: 10px 15px;
+      box-sizing: border-box;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      height: 100%;
+      opacity: 1;
+      transition: background 0.25s ease-in-out, opacity 0.25s ease-in-out;
+    }
+
+    .game-card:hover .overlay {
+     
+    }
+
+    .game-card .overlay h3 {
+      margin: 0 0 5px 0;
+      font-size: 18px;
+      font-weight: 600;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.6);
+    }
+
+    .game-card .overlay p {
+      margin: 0;
+      font-size: 14px;
+      font-weight: 400;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.6);
+    }
+
+    .iframe-container {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.5);
+      z-index: 20;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+    }
+
+    iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+      border-radius: 10px;
+      z-index: 5;
+    }
+
+    .back-button {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      font-size: 24px;
+      color: white;
+      cursor: pointer;
+      z-index: 30;
+      padding: 8px;
+      background-color: #134261;
+      border-radius: 20px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+      transition: background-color 0.1s ease;
+    }
+
+    .back-button:hover {
+      background-color: #1b567d;
+    }
+
+    .loader {
+      position: absolute;
+      width: 62px;
+      height: 62px;
+      background: linear-gradient(to right, #FFF 20%, #0000 21%);
+      background-repeat: repeat-x;
+      background-size: 36px 8px;
+      background-position: 9px bottom;
+      animation: moveX 0.5s linear infinite;
+      z-index: 9999;
+    }
+
+    .loader::before  {
+      content: '';
+      position: absolute;
+      width: 40px;
+      height: 40px;
+      border-radius: 2px;
+      background-color: #a5cde8;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+      animation: rotate 0.5s linear infinite;
+    }
+
+    @keyframes moveX {
+      0%, 25% {
+        background-position: 10px bottom;
+      }
+      75%, 100% {
+        background-position: -30px bottom;
+      }
+    }
+
+    @keyframes rotate {
+      0%, 25% {
+        transform: translate(-50%, -50%) rotate(0deg);
+      }
+      75%, 100% {
+        transform: translate(-55%, -55%) rotate(90deg);
+      }
+    }
+
+    #iframe-container iframe {
+      display: block;
+    }
+
+  </style>
+</head>
+<body>
+
+  <div class="search-bar">
+    <input type="text" placeholder="Search for a game..." id="search-input" oninput="filterGames()">
+  </div>
+
+  <div class="game-container" id="game-container">
+    <!-- game cards will go here-->
+  </div>
+
+  <div id="iframe-container" class="iframe-container" style="display: none;">
+    <span class="material-icons back-button" onclick="goBack()">arrow_back</span>
+    <div class="loader"></div>
+    <iframe id="game-iframe" src="" frameborder="0" onload="onIframeLoad()"></iframe>
+  </div>
+
+  <script>
+    let gamesData = [
+      {
+        name: "Basket Random",
+        image: "https://images.crazygames.com/basket-random_16x9/20240617090207/basket-random_16x9-cover?auto=format,compress&q=75&cs=strip",
+        description: "placeholder",
+        author: "Blobby Boi",
+        url: "https://spew45.github.io/simple-games-assets/src/basket-random/"
+      },
+      {
+        name: "Basket Rando",
+        image: "https://images.crazygames.com/basket-random_16x9/20240617090207/basket-random_16x9-cover?auto=format,compress&q=75&cs=strip",
+        description: "placeholder",
+        author: "Blobby Boi",
+        url: "https://spew45.github.io/simple-games-assets/src/basket-random/"
+      },
+      // Add more games here...
+    ];
+
+    function filterGames() {
+      const searchQuery = document.getElementById('search-input').value.toLowerCase();
+      const gameCards = document.querySelectorAll('.game-card');
+      
+      gameCards.forEach(card => {
+        const gameName = card.getAttribute('data-game-name').toLowerCase();
+        if (gameName.includes(searchQuery)) {
+          card.style.display = 'block';
+        } else {
+          card.style.display = 'none';
+        }
+      });
+    }
+
+    function createGameCards() {
+      const gameContainer = document.getElementById('game-container');
+      gameContainer.innerHTML = '';
+
+      gamesData.forEach(game => {
+        const gameCard = document.createElement('div');
+        gameCard.classList.add('game-card');
+        gameCard.setAttribute('data-game-name', game.name);
+
+        gameCard.innerHTML = `
+          <img src="${game.image}" alt="Game Image">
+          <div class="author-tag">${game.author}</div>
+          <div class="overlay">
+            <h3>${game.name}</h3>
+            <p>${game.description}</p>
+          </div>
+        `;
+
+        gameCard.onclick = () => openGameInIframe(game.url);
+
+        gameContainer.appendChild(gameCard);
+      });
+    }
+
+    function openGameInIframe(url) {
+      const iframeContainer = document.getElementById('iframe-container');
+      const iframe = document.getElementById('game-iframe');
+      const loader = document.querySelector('.loader');
+      
+      iframe.src = url;
+      iframeContainer.style.display = 'flex';
+      document.body.style.overflow = 'hidden';
+
+      loader.style.display = 'block';
+    }
+
+    function onIframeLoad() {
+      const iframeContainer = document.getElementById('iframe-container');
+      const loader = document.querySelector('.loader');
+
+      loader.style.display = 'none';
+    }
+
+    function goBack() {
+      const iframeContainer = document.getElementById('iframe-container');
+      iframeContainer.style.display = 'none';
+      document.getElementById('game-iframe').src = '';
+      document.body.style.overflow = 'auto';
+    }
+
+    window.onload = createGameCards;
+  </script>
+</body>
+</html>
