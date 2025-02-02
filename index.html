@@ -1,0 +1,353 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Particles Background with Sidebar</title>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Exo+2:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&display=swap" rel="stylesheet"> <!-- Stylish, futuristic font -->
+    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+    <style>
+        /* Reset */
+        body {
+            margin: 0;
+            font-family: Arial, Helvetica, sans-serif;
+            overflow: hidden;
+            background-color: #0a192f; /* Dark Blue Background */
+        }
+
+        /* Particles.js Container */
+        #particles-js {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background-color: #0a192f;
+            background-repeat: no-repeat;
+            background-size: cover;
+            background-position: 50% 50%;
+        }
+
+        /* Vortex Text */
+        .vortex-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 4rem;
+            font-weight: bold;
+            color: #ffffff; /* White color */
+            font-family: 'Orbitron', sans-serif; /* Futuristic font */
+            text-shadow: 0 0 5px rgba(255, 255, 255, 0.3), 0 0 10px rgba(255, 255, 255, 0.2); /* Reduced glow */
+            letter-spacing: 10px;
+            text-align: center;
+            visibility: visible; /* Default to visible */
+        }
+
+        /* Sidebar */
+        .sidebar {
+            position: fixed;
+            top: 50%;
+            left: -35px; /* Initially, partially visible off-screen */
+            transform: translateY(-50%);
+            background: rgba(0, 0, 0, 0.5);
+            padding: 10px;
+            border-radius: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            z-index: 30; /* Sidebar should be on top */
+            width: 35px; /* Width when collapsed */
+            transition: left 0.3s ease-in-out; /* Smooth transition for left */
+        }
+
+        .sidebar.expanded {
+            left: 10px; /* Sidebar is revealed when expanded, 10px from the left */
+        }
+
+        .sidebar button {
+            width: 35px;
+            height: 35px;
+            background: transparent;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            border-radius: 10px;
+            transition: background 0.3s;
+            position: relative;
+        }
+
+        .sidebar button:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .sidebar button .material-icons {
+            font-size: 22px;
+            color: white;
+        }
+
+        /* Tooltip on the right */
+        .sidebar button .tooltip {
+            position: absolute;
+            left: 50px; /* Moved further to the right */
+            font-family: 'Exo 2';
+            top: 50%;
+            transform: translateY(-50%); /* Vertically center the tooltip */
+            background: rgba(0, 0, 0, 0.7);
+            color: #fff;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 14px;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+
+        .sidebar button:hover .tooltip {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .divider {
+            width: 80%;
+            height: 2px;
+            background: rgba(255, 255, 255, 0.4);
+            margin: 5px auto;
+            border-radius: 5px;
+        }
+
+        /* New Iframe Container */
+        #gamehtml-iframe-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0); /* Transparent background */
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 20; /* Behind sidebar */
+        }
+
+        iframe {
+            width: 100%; /* Make iframe take up the whole screen */
+            height: 100%;
+            border-radius: 10px;
+            border: none;
+            background-color: transparent; /* Transparent iframe background */
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Particles.js Background -->
+    <div id="particles-js"></div>
+
+    <!-- Vortex Text -->
+    <div class="vortex-text" id="vortex-text">
+        VORTEX
+    </div>
+
+    <!-- Floating Sidebar -->
+    <div class="sidebar" id="sidebar">
+        <button>
+            <span class="material-icons">home</span>
+            <span class="tooltip">Home</span>
+        </button>
+        <button id="games-button">
+            <span class="material-icons">videogame_asset</span>
+            <span class="tooltip">Games</span>
+        </button>
+        <div class="divider"></div>
+        <button onclick='openInAboutBlank()'>
+            <span class="material-icons">rocket_launch</span>
+            <span class="tooltip">about:blank cloak</span>
+        </button>
+        <div class="divider"></div>
+        <button>
+            <span class="material-icons">tune</span>
+            <span class="tooltip">Settings</span>
+        </button>
+        <button>
+            <span class="material-icons">policy</span>
+            <span class="tooltip">Legal</span>
+        </button>
+    </div>
+
+    <!-- New Iframe Container -->
+    <div id="gamehtml-iframe-container">
+        <iframe id="gamehtml-iframe" src="" frameborder="0"></iframe>
+    </div>
+
+    <!-- Particles.js Configuration -->
+    <script>
+        particlesJS("particles-js", {
+            "particles": {
+                "number": {
+                    "value": 100, /* Adjust for more or fewer particles */
+                    "density": {
+                        "enable": true,
+                        "value_area": 800
+                    }
+                },
+                "color": {
+                    "value": "#4dabf7" /* Light blue particles */
+                },
+                "shape": {
+                    "type": "circle",
+                    "stroke": {
+                        "width": 0,
+                        "color": "#000000"
+                    }
+                },
+                "opacity": {
+                    "value": 0.5,
+                    "random": false
+                },
+                "size": {
+                    "value": 3,
+                    "random": true
+                },
+                "line_linked": {
+                    "enable": true,
+                    "distance": 150,
+                    "color": "#4dabf7",
+                    "opacity": 0.4,
+                    "width": 1
+                },
+                "move": {
+                    "enable": true,
+                    "speed": 3,
+                    "direction": "none",
+                    "random": false,
+                    "straight": false,
+                    "out_mode": "out",
+                    "bounce": false
+                }
+            },
+            "interactivity": {
+                "detect_on": "canvas",
+                "events": {
+                    "onhover": {
+                        "enable": true,
+                        "mode": "grab"
+                    },
+                    "onclick": {
+                        "enable": true,
+                        "mode": "push"
+                    },
+                    "resize": true
+                },
+                "modes": {
+                    "grab": {
+                        "distance": 140,
+                        "line_linked": {
+                            "opacity": 1
+                        }
+                    },
+                    "push": {
+                        "particles_nb": 4
+                    }
+                }
+            },
+            "retina_detect": true
+        });
+
+        // JavaScript to handle sidebar collapse and hover effect
+        const sidebar = document.getElementById('sidebar');
+        const vortexText = document.getElementById('vortex-text');
+        const gamesButton = document.getElementById('games-button');
+        const homeButton = document.querySelector('button'); // Home button is the first one
+
+        // Hide the Vortex text and show iframe when Games button is clicked
+        gamesButton.addEventListener('click', function() {
+            vortexText.style.visibility = 'hidden'; // Hide the Vortex text when Games button is clicked
+            openGameInIframe('games.html'); // Open gamehtml.html inside the iframe
+        });
+
+        // Show Vortex text again if Home button is clicked
+        homeButton.addEventListener('click', function() {
+            vortexText.style.visibility = 'visible'; // Show Vortex text again when Home button is clicked
+            closeIframe(); // Hide the iframe when Home button is clicked
+        });
+
+        // Show sidebar when cursor moves to the left area near the sidebar
+        document.addEventListener('mousemove', function(event) {
+            if (event.clientX < 150) { // Trigger if mouse enters near left side
+                sidebar.classList.add('expanded');
+            } else {
+                sidebar.classList.remove('expanded');
+            }
+        });
+
+        // Function to open game in iframe
+        function openGameInIframe(url) {
+            const iframeContainer = document.getElementById('gamehtml-iframe-container');
+            const iframe = document.getElementById('gamehtml-iframe');
+            iframe.src = url;
+            iframeContainer.style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+        }
+
+        // Function to close iframe
+        function closeIframe() {
+            const iframeContainer = document.getElementById('gamehtml-iframe-container');
+            iframeContainer.style.display = 'none';
+            document.getElementById('gamehtml-iframe').src = ''; // Clear iframe content
+            document.body.style.overflow = 'auto';
+        }
+            function openInAboutBlank() {
+    // Open a new about:blank tab and keep it in focus
+    var win = window.open();
+
+    if (win) {
+        var url = 'index.html'; // Link to your index.html page
+
+        var iframe = win.document.createElement('iframe');
+        iframe.style.width = "100vw";
+        iframe.style.height = "100vh";
+        iframe.style.border = "none";
+        iframe.style.margin = "0";
+
+        // Set the body styles for the iframe
+        win.document.body.style.margin = "0";
+        win.document.body.style.padding = "0";
+        win.document.body.style.overflow = "hidden";
+
+        // Set the iframe's source to index.html
+        iframe.src = url;
+        win.document.body.appendChild(iframe);
+
+        // Set the title of the about:blank page to "Home"
+        win.document.title = "Home";
+
+        // Set the favicon of the about:blank page
+        var link = win.document.createElement("link");
+        link.rel = "icon";
+        link.href = "favicon(3).ico";  // Make sure to adjust the path of your favicon if needed
+        win.document.head.appendChild(link);
+
+        // Open Google Classroom in a new tab, and keep the previous window focused
+        setTimeout(() => {
+            var classroomTab = window.open("https://classroom.google.com/", "_blank", "noopener,noreferrer");
+
+            // If the about:blank window is successfully opened, bring it to the front
+            if (win) {
+                win.focus();
+            }
+        }, 0);
+    } else {
+        alert("Popup blocked! Please allow popups for this site.");
+    }
+}
+
+
+    </script>
+
+</body>
+</html>
